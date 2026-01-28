@@ -495,7 +495,7 @@
                 percentageEl.textContent = `${percentage}%`;
                 elapsedEl.textContent = formatTime(elapsed);
                 remainingEl.textContent = remaining > 0 ? formatTime(remaining) : "Complete!";
-                startTimeEl.textContent = formatTimeShort(state.startTime);
+                startTimeEl.textContent = formatEndTime(state.startTime);
 
                 const endTime = new Date(state.startTime.getTime() + state.duration);
                 endTimeEl.textContent = formatEndTime(endTime);
