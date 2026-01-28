@@ -340,7 +340,7 @@
                 <span class="time-value" id="start-time">-</span>
             </div>
             <div class="time-row">
-                <span class="time-label">Goal</span>
+                <span class="time-label">Ends</span>
                 <span class="time-value" id="end-time">-</span>
             </div>
         </div>
@@ -449,6 +449,25 @@
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
+        function formatEndTime(date) {
+            const now = new Date();
+            const isToday = date.toDateString() === now.toDateString();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const isTomorrow = date.toDateString() === tomorrow.toDateString();
+
+            const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (isToday) {
+                return `Today ${time}`;
+            } else if (isTomorrow) {
+                return `Tomorrow ${time}`;
+            } else {
+                const day = date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+                return `${day} ${time}`;
+            }
+        }
+
         function getPhase(elapsedHours) {
             let currentPhase = phases[0];
             for (const phase of phases) {
@@ -479,7 +498,7 @@
                 startTimeEl.textContent = formatTimeShort(state.startTime);
 
                 const endTime = new Date(state.startTime.getTime() + state.duration);
-                endTimeEl.textContent = formatTimeShort(endTime);
+                endTimeEl.textContent = formatEndTime(endTime);
 
                 // Update phase
                 const phase = getPhase(elapsedHours);
