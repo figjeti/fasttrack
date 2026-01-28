@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FastTrack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top, 20px);
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-ring {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.3));
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: #2a2a4a;
+            stroke-width: 12;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .percentage {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .time-display {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .time-row:last-child {
+            border-bottom: none;
+        }
+
+        .time-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .time-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .time-value.highlight {
+            color: #e94560;
+            font-size: 1.3rem;
+        }
+
+        .duration-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .duration-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            color: #fff;
+            padding: 15px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .duration-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .duration-btn.active {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.2);
+        }
+
+        .duration-btn span {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .custom-input-wrapper {
+            display: none;
+            grid-column: span 3;
+            margin-top: 5px;
+        }
+
+        .custom-input-wrapper.show {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .custom-input {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #e94560;
+            border-radius: 12px;
+            padding: 12px 10px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            text-align: center;
+        }
+
+        .custom-input::placeholder {
+            color: #666;
+        }
+
+        .custom-input-btn {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .stop-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid #e94560;
+        }
+
+        .stop-btn:hover {
+            background: rgba(233, 69, 96, 0.2);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .phase-indicator {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .phase-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e94560;
+        }
+
+        .phase-desc {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        .celebrate {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FastTrack</h1>
+
+        <div class="progress-ring">
+            <svg width="250" height="250">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#e94560"/>
+                        <stop offset="100%" stop-color="#ff6b6b"/>
+                    </linearGradient>
+                </defs>
+                <circle class="progress-ring-bg" cx="125" cy="125" r="100"/>
+                <circle class="progress-ring-fill" cx="125" cy="125" r="100"
+                    stroke-dasharray="628.32" stroke-dashoffset="628.32"/>
+            </svg>
+            <div class="progress-center">
+                <div class="percentage">0%</div>
+                <div class="status-text">Ready to start</div>
+            </div>
+        </div>
+
+        <div class="phase-indicator hidden" id="phase-indicator">
+            <div class="phase-name" id="phase-name">-</div>
+            <div class="phase-desc" id="phase-desc">-</div>
+        </div>
+
+        <div class="time-display">
+            <div class="time-row">
+                <span class="time-label">Elapsed</span>
+                <span class="time-value" id="elapsed">00:00:00</span>
+            </div>
+            <div class="time-row">
+                <span class="time-label">Remaining</span>
+                <span class="time-value highlight" id="remaining">--:--:--</span>
+            </div>
+            <div class="time-row" id="start-time-row">
+                <span class="time-label">Started</span>
+                <span class="time-value" id="start-time">-</span>
+            </div>
+            <div class="time-row">
+                <span class="time-label">Goal</span>
+                <span class="time-value" id="end-time">-</span>
+            </div>
+        </div>
+
+        <div class="duration-selector" id="duration-selector">
+            <button class="duration-btn" data-hours="12">12h<span>Beginner</span></button>
+            <button class="duration-btn active" data-hours="16">16h<span>16:8</span></button>
+            <button class="duration-btn" data-hours="18">18h<span>18:6</span></button>
+            <button class="duration-btn" data-hours="20">20h<span>20:4</span></button>
+            <button class="duration-btn" data-hours="24">24h<span>OMAD</span></button>
+            <button class="duration-btn" data-hours="custom" id="custom-btn">Custom<span>Any time</span></button>
+            <div class="custom-input-wrapper" id="custom-input-wrapper">
+                <input type="number" class="custom-input" id="custom-days" placeholder="Days" min="0" max="40">
+                <input type="number" class="custom-input" id="custom-hours" placeholder="Hours" min="0" max="23">
+                <button class="custom-input-btn" id="custom-set-btn">Set</button>
+            </div>
+        </div>
+
+        <button class="main-btn start-btn" id="start-btn">Start Fast</button>
+        <button class="main-btn stop-btn hidden" id="stop-btn">End Fast</button>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value" id="streak">0</div>
+                <div class="stat-label">Day Streak</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="total-fasts">0</div>
+                <div class="stat-label">Total Fasts</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="longest">0h</div>
+                <div class="stat-label">Longest</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'fasttrack_data';
+        const CIRCUMFERENCE = 2 * Math.PI * 100;
+
+        const phases = [
+            { hours: 0, name: "Fed State", desc: "Blood sugar elevated, insulin active" },
+            { hours: 4, name: "Post-Absorptive", desc: "Blood sugar normalizing" },
+            { hours: 8, name: "Early Fasting", desc: "Glycogen being used for energy" },
+            { hours: 12, name: "Metabolic Shift", desc: "Fat burning begins" },
+            { hours: 14, name: "Fat Burning", desc: "Growth hormone increasing" },
+            { hours: 16, name: "Ketosis Begins", desc: "Body switching to ketones" },
+            { hours: 18, name: "Deep Ketosis", desc: "Autophagy ramping up" },
+            { hours: 24, name: "Autophagy Active", desc: "Cellular cleanup in progress" },
+            { hours: 36, name: "Deep Autophagy", desc: "Maximum cellular renewal" }
+        ];
+
+        let state = {
+            isFasting: false,
+            startTime: null,
+            duration: 16 * 60 * 60 * 1000,
+            stats: {
+                streak: 0,
+                totalFasts: 0,
+                longestFast: 0,
+                lastFastDate: null
+            }
+        };
+
+        const progressFill = document.querySelector('.progress-ring-fill');
+        const percentageEl = document.querySelector('.percentage');
+        const statusText = document.querySelector('.status-text');
+        const elapsedEl = document.getElementById('elapsed');
+        const remainingEl = document.getElementById('remaining');
+        const startTimeEl = document.getElementById('start-time');
+        const endTimeEl = document.getElementById('end-time');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const durationSelector = document.getElementById('duration-selector');
+        const phaseIndicator = document.getElementById('phase-indicator');
+        const phaseName = document.getElementById('phase-name');
+        const phaseDesc = document.getElementById('phase-desc');
+        const streakEl = document.getElementById('streak');
+        const totalFastsEl = document.getElementById('total-fasts');
+        const longestEl = document.getElementById('longest');
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state = { ...state, ...parsed };
+                if (state.startTime) state.startTime = new Date(state.startTime);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function formatTime(ms) {
+            if (ms < 0) ms = 0;
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function formatTimeShort(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getPhase(elapsedHours) {
+            let currentPhase = phases[0];
+            for (const phase of phases) {
+                if (elapsedHours >= phase.hours) {
+                    currentPhase = phase;
+                }
+            }
+            return currentPhase;
+        }
+
+        function updateUI() {
+            if (state.isFasting && state.startTime) {
+                const now = new Date();
+                const elapsed = now - state.startTime;
+                const remaining = state.duration - elapsed;
+                const progress = Math.min(elapsed / state.duration, 1);
+                const percentage = Math.floor(progress * 100);
+                const elapsedHours = elapsed / (1000 * 60 * 60);
+
+                // Update progress ring
+                const offset = CIRCUMFERENCE * (1 - progress);
+                progressFill.style.strokeDashoffset = offset;
+
+                // Update text
+                percentageEl.textContent = `${percentage}%`;
+                elapsedEl.textContent = formatTime(elapsed);
+                remainingEl.textContent = remaining > 0 ? formatTime(remaining) : "Complete!";
+                startTimeEl.textContent = formatTimeShort(state.startTime);
+
+                const endTime = new Date(state.startTime.getTime() + state.duration);
+                endTimeEl.textContent = formatTimeShort(endTime);
+
+                // Update phase
+                const phase = getPhase(elapsedHours);
+                phaseIndicator.classList.remove('hidden');
+                phaseName.textContent = phase.name;
+                phaseDesc.textContent = phase.desc;
+
+                if (percentage >= 100) {
+                    statusText.textContent = "Goal reached!";
+                    if (!state.celebrated) {
+                        celebrate();
+                        state.celebrated = true;
+                    }
+                } else {
+                    statusText.textContent = "Fasting";
+                }
+
+                // UI state
+                startBtn.classList.add('hidden');
+                stopBtn.classList.remove('hidden');
+                durationSelector.style.opacity = '0.5';
+                durationSelector.style.pointerEvents = 'none';
+            } else {
+                progressFill.style.strokeDashoffset = CIRCUMFERENCE;
+                percentageEl.textContent = '0%';
+                statusText.textContent = 'Ready to start';
+                elapsedEl.textContent = '00:00:00';
+                remainingEl.textContent = formatTime(state.duration);
+                startTimeEl.textContent = '-';
+                endTimeEl.textContent = '-';
+
+                phaseIndicator.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+                stopBtn.classList.add('hidden');
+                durationSelector.style.opacity = '1';
+                durationSelector.style.pointerEvents = 'auto';
+            }
+
+            // Update stats
+            streakEl.textContent = state.stats.streak;
+            totalFastsEl.textContent = state.stats.totalFasts;
+            longestEl.textContent = `${Math.floor(state.stats.longestFast)}h`;
+        }
+
+        function startFast() {
+            state.isFasting = true;
+            state.startTime = new Date();
+            state.celebrated = false;
+            saveState();
+            updateUI();
+        }
+
+        function endFast() {
+            if (state.isFasting && state.startTime) {
+                const elapsed = new Date() - state.startTime;
+                const elapsedHours = elapsed / (1000 * 60 * 60);
+                const targetHours = state.duration / (1000 * 60 * 60);
+
+                // Update stats if fast was at least 50% complete
+                if (elapsedHours >= targetHours * 0.5) {
+                    state.stats.totalFasts++;
+
+                    if (elapsedHours > state.stats.longestFast) {
+                        state.stats.longestFast = elapsedHours;
+                    }
+
+                    // Streak logic
+                    const today = new Date().toDateString();
+                    if (state.stats.lastFastDate !== today) {
+                        const yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        if (state.stats.lastFastDate === yesterday.toDateString()) {
+                            state.stats.streak++;
+                        } else if (state.stats.lastFastDate !== today) {
+                            state.stats.streak = 1;
+                        }
+                        state.stats.lastFastDate = today;
+                    }
+                }
+            }
+
+            state.isFasting = false;
+            state.startTime = null;
+            saveState();
+            updateUI();
+        }
+
+        function setDuration(hours) {
+            state.duration = hours * 60 * 60 * 1000;
+            saveState();
+            updateUI();
+        }
+
+        function celebrate() {
+            const colors = ['#e94560', '#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+            document.querySelector('.container').classList.add('celebrate');
+            setTimeout(() => document.querySelector('.container').classList.remove('celebrate'), 500);
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startFast);
+        stopBtn.addEventListener('click', () => {
+            if (confirm('End your fast?')) endFast();
+        });
+
+        const customBtn = document.getElementById('custom-btn');
+        const customInputWrapper = document.getElementById('custom-input-wrapper');
+        const customDaysInput = document.getElementById('custom-days');
+        const customHoursInput = document.getElementById('custom-hours');
+        const customSetBtn = document.getElementById('custom-set-btn');
+
+        function clearAllActive() {
+            document.querySelectorAll('.duration-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+
+        function formatCustomLabel(totalHours) {
+            const days = Math.floor(totalHours / 24);
+            const hrs = totalHours % 24;
+            if (days > 0 && hrs > 0) {
+                return `${days}d ${hrs}h`;
+            } else if (days > 0) {
+                return `${days}d`;
+            } else {
+                return `${totalHours}h`;
+            }
+        }
+
+        durationSelector.addEventListener('click', (e) => {
+            const btn = e.target.closest('.duration-btn');
+            if (btn && !state.isFasting) {
+                if (btn.dataset.hours === 'custom') {
+                    customInputWrapper.classList.toggle('show');
+                    if (customInputWrapper.classList.contains('show')) {
+                        customDaysInput.focus();
+                    }
+                } else {
+                    customInputWrapper.classList.remove('show');
+                    clearAllActive();
+                    btn.classList.add('active');
+                    customBtn.innerHTML = `Custom<span>Any time</span>`;
+                    setDuration(parseInt(btn.dataset.hours));
+                }
+            }
+        });
+
+        customSetBtn.addEventListener('click', () => {
+            const days = parseInt(customDaysInput.value) || 0;
+            const hours = parseInt(customHoursInput.value) || 0;
+            const totalHours = (days * 24) + hours;
+
+            if (totalHours > 0 && totalHours <= 960) {
+                clearAllActive();
+                customBtn.classList.add('active');
+                customBtn.innerHTML = `${formatCustomLabel(totalHours)}<span>Custom</span>`;
+                customInputWrapper.classList.remove('show');
+                setDuration(totalHours);
+            }
+        });
+
+        customDaysInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') customSetBtn.click();
+        });
+
+        customHoursInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') customSetBtn.click();
+        });
+
+        // Initialize
+        loadState();
+
+        // Set active duration button on load
+        const initHours = state.duration / (1000 * 60 * 60);
+        const presetHours = [12, 16, 18, 20, 24, 36];
+        const isPreset = presetHours.includes(initHours);
+
+        document.querySelectorAll('.duration-btn').forEach(btn => {
+            if (btn.dataset.hours === 'custom') {
+                btn.classList.toggle('active', !isPreset);
+                if (!isPreset) {
+                    btn.innerHTML = `${formatCustomLabel(initHours)}<span>Custom</span>`;
+                }
+            } else {
+                btn.classList.toggle('active', parseInt(btn.dataset.hours) === initHours);
+            }
+        });
+
+        updateUI();
+        setInterval(updateUI, 1000);
+    </script>
+</body>
+</html>
