@@ -1511,29 +1511,35 @@
                     ((m.type === 'time' && elapsedHours < m.hours + 0.05) ||
                      (m.type === 'pct' && percentage < m.pct + 2));
 
+                let shouldScroll = false;
                 if (justUnlocked) {
                     lastMilestoneNotified = key;
                     showToast(m.icon, `${m.name} — ${m.desc}`);
+                    shouldScroll = true;
                 }
 
                 const classes = ['milestone'];
                 if (unlocked) classes.push('unlocked');
                 if (justUnlocked) classes.push('just-unlocked');
 
-                return `<div class="${classes.join(' ')}" title="${m.desc}">
+                return { html: `<div class="${classes.join(' ')}" title="${m.desc}">
                     <div class="milestone-icon">${m.icon}</div>
                     <div class="milestone-name">${m.name}</div>
-                </div>`;
-            }).join('');
+                </div>`, shouldScroll };
+            });
 
-            milestonesTrack.innerHTML = html;
+            const needsScroll = results.some(r => r.shouldScroll);
+            milestonesTrack.innerHTML = results.map(r => r.html).join('');
             milestonesEl.classList.remove('hidden');
 
-            // Auto-scroll to latest unlocked milestone
-            if (latestUnlockedIdx >= 0) {
+            // Only auto-scroll the track (not the page) when a new milestone unlocks
+            if (needsScroll && latestUnlockedIdx >= 0) {
                 const el = milestonesTrack.children[latestUnlockedIdx];
                 if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    milestonesTrack.scrollTo({
+                        left: el.offsetLeft - milestonesTrack.offsetWidth / 2 + el.offsetWidth / 2,
+                        behavior: 'smooth'
+                    });
                 }
             }
         }
