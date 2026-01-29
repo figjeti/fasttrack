@@ -1500,7 +1500,7 @@
             const sorted = [...timeMilestones, ...pctMilestones];
 
             let latestUnlockedIdx = -1;
-            const html = sorted.map((m, i) => {
+            const results = sorted.map((m, i) => {
                 const unlocked = m.type === 'time'
                     ? elapsedHours >= m.hours
                     : percentage >= m.pct;
