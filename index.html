@@ -5,8 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.svg">
     <title>FastTrack</title>
     <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f3460;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --bg-card-hover: rgba(255, 255, 255, 0.1);
+            --bg-input: rgba(255, 255, 255, 0.1);
+            --text-primary: #fff;
+            --text-secondary: #888;
+            --text-muted: #666;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent: #e94560;
+            --accent-light: #ff6b6b;
+            --accent-glow: rgba(233, 69, 96, 0.3);
+            --ring-bg: #2a2a4a;
+            --success: #6bcb77;
+            --warning: #ffd93d;
+            --info: #4d96ff;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #e4e6eb;
+            --bg-tertiary: #d8dadf;
+            --bg-card: rgba(0, 0, 0, 0.04);
+            --bg-card-hover: rgba(0, 0, 0, 0.08);
+            --bg-input: rgba(0, 0, 0, 0.06);
+            --text-primary: #1a1a2e;
+            --text-secondary: #65676b;
+            --text-muted: #8a8d91;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --ring-bg: #d8dadf;
+            --accent-glow: rgba(233, 69, 96, 0.15);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,11 +54,12 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
             min-height: 100vh;
-            color: #fff;
+            color: var(--text-primary);
             padding: 20px;
             padding-top: env(safe-area-inset-top, 20px);
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
@@ -27,14 +67,42 @@
             margin: 0 auto;
         }
 
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
         h1 {
             text-align: center;
             font-size: 2rem;
-            margin-bottom: 30px;
             background: linear-gradient(90deg, #e94560, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-card-hover);
         }
 
         .progress-ring {
@@ -46,12 +114,12 @@
 
         .progress-ring svg {
             transform: rotate(-90deg);
-            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.3));
+            filter: drop-shadow(0 0 20px var(--accent-glow));
         }
 
         .progress-ring-bg {
             fill: none;
-            stroke: #2a2a4a;
+            stroke: var(--ring-bg);
             stroke-width: 12;
         }
 
@@ -78,12 +146,12 @@
 
         .status-text {
             font-size: 0.9rem;
-            color: #888;
+            color: var(--text-secondary);
             margin-top: 5px;
         }
 
         .time-display {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-card);
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
@@ -94,7 +162,7 @@
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .time-row:last-child {
@@ -102,7 +170,7 @@
         }
 
         .time-label {
-            color: #888;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
@@ -112,7 +180,7 @@
         }
 
         .time-value.highlight {
-            color: #e94560;
+            color: var(--accent);
             font-size: 1.3rem;
         }
 
@@ -124,9 +192,9 @@
         }
 
         .duration-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--bg-card);
             border: 2px solid transparent;
-            color: #fff;
+            color: var(--text-primary);
             padding: 15px 10px;
             border-radius: 12px;
             cursor: pointer;
@@ -135,18 +203,18 @@
         }
 
         .duration-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--bg-card-hover);
         }
 
         .duration-btn.active {
-            border-color: #e94560;
+            border-color: var(--accent);
             background: rgba(233, 69, 96, 0.2);
         }
 
         .duration-btn span {
             display: block;
             font-size: 0.7rem;
-            color: #888;
+            color: var(--text-secondary);
             margin-top: 5px;
         }
 
@@ -164,18 +232,18 @@
 
         .custom-input {
             width: 80px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #e94560;
+            background: var(--bg-input);
+            border: 2px solid var(--accent);
             border-radius: 12px;
             padding: 12px 10px;
-            color: #fff;
+            color: var(--text-primary);
             font-size: 1rem;
             outline: none;
             text-align: center;
         }
 
         .custom-input::placeholder {
-            color: #666;
+            color: var(--text-muted);
         }
 
         .custom-input-btn {
@@ -211,13 +279,31 @@
         }
 
         .stop-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 2px solid #e94560;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 2px solid var(--accent);
         }
 
         .stop-btn:hover {
             background: rgba(233, 69, 96, 0.2);
+        }
+
+        .share-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #4d96ff, #6bcb77);
+            color: #fff;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.02);
         }
 
         .stats {
@@ -228,7 +314,7 @@
         }
 
         .stat-box {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-card);
             border-radius: 15px;
             padding: 15px;
             text-align: center;
@@ -237,19 +323,19 @@
         .stat-value {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #e94560;
+            color: var(--accent);
         }
 
         .stat-label {
             font-size: 0.75rem;
-            color: #888;
+            color: var(--text-secondary);
             margin-top: 5px;
         }
 
         .phase-indicator {
             text-align: center;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-card);
             border-radius: 15px;
             margin-bottom: 20px;
         }
@@ -257,12 +343,12 @@
         .phase-name {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #e94560;
+            color: var(--accent);
         }
 
         .phase-desc {
             font-size: 0.85rem;
-            color: #888;
+            color: var(--text-secondary);
             margin-top: 5px;
         }
 
@@ -270,6 +356,591 @@
             display: none !important;
         }
 
+        /* Weekly Goal */
+        .goal-section {
+            margin-top: 15px;
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .goal-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .goal-edit-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .goal-progress-bar {
+            height: 8px;
+            background: var(--ring-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .goal-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        .goal-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .goal-input-row input {
+            width: 60px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .goal-input-row label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .goal-input-row button {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Section headers */
+        .section-header {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 25px 0 12px;
+            color: var(--text-primary);
+        }
+
+        /* Weekly Summary */
+        .weekly-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .summary-box {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--info);
+        }
+
+        .summary-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .achievement {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 10px 4px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .achievement.locked {
+            opacity: 0.35;
+            filter: grayscale(1);
+        }
+
+        .achievement.unlocked {
+            border: 1px solid var(--accent);
+        }
+
+        .achievement-icon {
+            font-size: 1.5rem;
+            display: block;
+        }
+
+        .achievement-name {
+            font-size: 0.55rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+
+        /* Trends Chart */
+        .trends-section {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .trends-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .trends-toggle {
+            display: flex;
+            gap: 4px;
+        }
+
+        .trends-toggle button {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .trends-toggle button.active {
+            background: rgba(233, 69, 96, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 120px;
+        }
+
+        .chart-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-bar {
+            fill: url(#chartGradient);
+            rx: 3;
+        }
+
+        .chart-label {
+            fill: var(--text-secondary);
+            font-size: 9px;
+            text-anchor: middle;
+        }
+
+        .chart-value {
+            fill: var(--text-secondary);
+            font-size: 8px;
+            text-anchor: middle;
+        }
+
+        .chart-empty {
+            fill: var(--text-muted);
+            font-size: 12px;
+            text-anchor: middle;
+        }
+
+        /* Calendar */
+        .calendar-section {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calendar-nav button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 10px;
+        }
+
+        .calendar-nav span {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            padding: 2px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: var(--bg-input);
+            position: relative;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+        }
+
+        .calendar-day.today {
+            border: 1px solid var(--accent);
+        }
+
+        .calendar-day.level-1 { background: rgba(233, 69, 96, 0.15); }
+        .calendar-day.level-2 { background: rgba(233, 69, 96, 0.3); }
+        .calendar-day.level-3 { background: rgba(233, 69, 96, 0.5); }
+        .calendar-day.level-4 { background: rgba(233, 69, 96, 0.7); color: #fff; }
+
+        /* History */
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-date {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .history-details {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .history-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 3px;
+        }
+
+        .history-status {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .history-status.completed {
+            background: rgba(107, 203, 119, 0.2);
+            color: var(--success);
+        }
+
+        .history-status.partial {
+            background: rgba(255, 217, 61, 0.2);
+            color: var(--warning);
+        }
+
+        .history-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            margin-left: 6px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .history-delete:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        .history-show-all {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .history-show-all button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 20px;
+        }
+
+        /* Settings */
+        .settings-section {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 0.9rem;
+        }
+
+        .setting-desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--ring-bg);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--accent);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .data-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .data-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .data-btn:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* End fast modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 350px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .modal textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: none;
+            height: 60px;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        .modal textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal-cancel {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .modal-confirm {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 12px 20px;
+            z-index: 2000;
+            transition: transform 0.4s ease;
+            text-align: center;
+            max-width: 320px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .toast-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Confetti */
         .confetti {
             position: fixed;
             width: 10px;
@@ -279,14 +950,8 @@
         }
 
         @keyframes confetti-fall {
-            0% {
-                opacity: 1;
-                transform: translateY(0) rotate(0deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(100vh) rotate(720deg);
-            }
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
         }
 
         .celebrate {
@@ -297,11 +962,17 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
+
+        /* Share canvas (hidden) */
+        #share-canvas { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>FastTrack</h1>
+        <div class="header">
+            <h1>FastTrack</h1>
+            <button class="theme-toggle" id="theme-toggle" title="Toggle theme"></button>
+        </div>
 
         <div class="progress-ring">
             <svg width="250" height="250">
@@ -361,6 +1032,7 @@
 
         <button class="main-btn start-btn" id="start-btn">Start Fast</button>
         <button class="main-btn stop-btn hidden" id="stop-btn">End Fast</button>
+        <button class="share-btn hidden" id="share-btn">Share Your Achievement</button>
 
         <div class="stats">
             <div class="stat-box">
@@ -376,7 +1048,134 @@
                 <div class="stat-label">Longest</div>
             </div>
         </div>
+
+        <!-- Weekly Goal -->
+        <div class="goal-section" id="goal-section">
+            <div class="goal-header">
+                <span class="goal-title">Weekly Goal</span>
+                <button class="goal-edit-btn" id="goal-edit-btn">Edit</button>
+            </div>
+            <div class="goal-progress-bar">
+                <div class="goal-progress-fill" id="goal-progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="goal-text" id="goal-text">0 / 5 fasts this week</div>
+            <div class="goal-input-row hidden" id="goal-input-row">
+                <label>Target:</label>
+                <input type="number" id="goal-input" min="1" max="14" value="5">
+                <label>fasts/week</label>
+                <button id="goal-save-btn">Save</button>
+            </div>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div class="section-header">This Week</div>
+        <div class="weekly-summary">
+            <div class="summary-box">
+                <div class="summary-value" id="summary-avg">0h</div>
+                <div class="summary-label">Avg Duration</div>
+            </div>
+            <div class="summary-box">
+                <div class="summary-value" id="summary-rate">0%</div>
+                <div class="summary-label">Completion</div>
+            </div>
+            <div class="summary-box">
+                <div class="summary-value" id="summary-total">0h</div>
+                <div class="summary-label">Total Hours</div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="section-header">Achievements</div>
+        <div class="achievements-grid" id="achievements-grid"></div>
+
+        <!-- Trends -->
+        <div class="section-header">Trends</div>
+        <div class="trends-section">
+            <div class="trends-header">
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">Fasting Duration</span>
+                <div class="trends-toggle">
+                    <button class="active" data-days="7">7d</button>
+                    <button data-days="30">30d</button>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-container">
+                <svg id="trends-svg" viewBox="0 0 370 120" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#e94560"/>
+                            <stop offset="100%" stop-color="#ff6b6b"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="section-header">Calendar</div>
+        <div class="calendar-section">
+            <div class="calendar-nav">
+                <button id="cal-prev">&lt;</button>
+                <span id="cal-month"></span>
+                <button id="cal-next">&gt;</button>
+            </div>
+            <div class="calendar-weekdays">
+                <div class="calendar-weekday">Su</div>
+                <div class="calendar-weekday">Mo</div>
+                <div class="calendar-weekday">Tu</div>
+                <div class="calendar-weekday">We</div>
+                <div class="calendar-weekday">Th</div>
+                <div class="calendar-weekday">Fr</div>
+                <div class="calendar-weekday">Sa</div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+        </div>
+
+        <!-- History -->
+        <div class="section-header">History</div>
+        <div class="history-list" id="history-list">
+            <div class="history-empty">No fasts recorded yet</div>
+        </div>
+        <div class="history-show-all hidden" id="history-show-all">
+            <button id="history-toggle-btn">Show All</button>
+        </div>
+
+        <!-- Settings -->
+        <div class="section-header">Settings</div>
+        <div class="settings-section">
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Notifications</div>
+                    <div class="setting-desc">Alert when fast completes</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="notif-toggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Data</div>
+                    <div class="setting-desc">Export or import your fasting data</div>
+                </div>
+            </div>
+            <div class="data-buttons">
+                <button class="data-btn" id="export-btn">Export JSON</button>
+                <button class="data-btn" id="import-btn">Import JSON</button>
+            </div>
+            <input type="file" id="import-file" accept=".json" style="display:none">
+        </div>
+
+        <div style="height: 40px;"></div>
     </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toast-icon"></span>
+        <span class="toast-text" id="toast-text"></span>
+    </div>
+
+    <!-- Hidden canvas for share card -->
+    <canvas id="share-canvas" width="600" height="400"></canvas>
 
     <script>
         const STORAGE_KEY = 'fasttrack_data';
@@ -394,18 +1193,49 @@
             { hours: 36, name: "Deep Autophagy", desc: "Maximum cellular renewal" }
         ];
 
+        const ACHIEVEMENTS = [
+            { id: 'first_fast', icon: '\u2B50', name: 'First Fast', desc: 'Complete your first fast', check: s => s.stats.totalFasts >= 1 },
+            { id: 'fasts_10', icon: '\uD83D\uDD25', name: '10 Fasts', desc: 'Complete 10 fasts', check: s => s.stats.totalFasts >= 10 },
+            { id: 'fasts_50', icon: '\uD83D\uDCAA', name: '50 Fasts', desc: 'Complete 50 fasts', check: s => s.stats.totalFasts >= 50 },
+            { id: 'fasts_100', icon: '\uD83C\uDFC6', name: '100 Club', desc: 'Complete 100 fasts', check: s => s.stats.totalFasts >= 100 },
+            { id: 'streak_7', icon: '\uD83D\uDD25', name: '7 Day Streak', desc: 'Fast 7 days in a row', check: s => s.stats.streak >= 7 },
+            { id: 'streak_30', icon: '\u26A1', name: '30 Day Streak', desc: 'Fast 30 days in a row', check: s => s.stats.streak >= 30 },
+            { id: 'hours_18', icon: '\uD83C\uDF19', name: '18 Hour Fast', desc: 'Complete an 18+ hour fast', check: s => s.stats.longestFast >= 18 },
+            { id: 'hours_24', icon: '\uD83C\uDF1F', name: '24 Hour Fast', desc: 'Complete a 24+ hour fast', check: s => s.stats.longestFast >= 24 },
+            { id: 'hours_36', icon: '\uD83D\uDE80', name: '36 Hour Fast', desc: 'Complete a 36+ hour fast', check: s => s.stats.longestFast >= 36 },
+            { id: 'early_bird', icon: '\uD83C\uDF05', name: 'Early Bird', desc: 'Start a fast before 6 AM', check: (s, ctx) => ctx === 'early_bird' },
+            { id: 'night_owl', icon: '\uD83C\uDF03', name: 'Night Owl', desc: 'Start a fast after 8 PM', check: (s, ctx) => ctx === 'night_owl' },
+            { id: 'century', icon: '\uD83C\uDFAF', name: 'Century', desc: 'Fast 100+ hours total', check: s => {
+                const total = (s.history || []).reduce((sum, h) => sum + (h.actualDuration || 0), 0);
+                return total >= 100 * 3600000;
+            }}
+        ];
+
         let state = {
             isFasting: false,
             startTime: null,
             duration: 16 * 60 * 60 * 1000,
+            celebrated: false,
+            notifiedComplete: false,
             stats: {
                 streak: 0,
                 totalFasts: 0,
                 longestFast: 0,
                 lastFastDate: null
-            }
+            },
+            history: [],
+            achievements: { unlocked: {} },
+            goals: { weeklyTarget: 5 },
+            settings: { theme: 'dark', notifications: false }
         };
 
+        let calendarMonth = new Date().getMonth();
+        let calendarYear = new Date().getFullYear();
+        let historyShowAll = false;
+        let trendsDays = 7;
+        let lastPhaseNotified = null;
+
+        // DOM refs
         const progressFill = document.querySelector('.progress-ring-fill');
         const percentageEl = document.querySelector('.percentage');
         const statusText = document.querySelector('.status-text');
@@ -415,6 +1245,7 @@
         const endTimeEl = document.getElementById('end-time');
         const startBtn = document.getElementById('start-btn');
         const stopBtn = document.getElementById('stop-btn');
+        const shareBtn = document.getElementById('share-btn');
         const durationSelector = document.getElementById('duration-selector');
         const phaseIndicator = document.getElementById('phase-indicator');
         const phaseName = document.getElementById('phase-name');
@@ -422,14 +1253,31 @@
         const streakEl = document.getElementById('streak');
         const totalFastsEl = document.getElementById('total-fasts');
         const longestEl = document.getElementById('longest');
+        const themeToggle = document.getElementById('theme-toggle');
 
         function loadState() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                state = { ...state, ...parsed };
+                state = mergeDeep(state, parsed);
                 if (state.startTime) state.startTime = new Date(state.startTime);
+                if (!state.history) state.history = [];
+                if (!state.achievements) state.achievements = { unlocked: {} };
+                if (!state.goals) state.goals = { weeklyTarget: 5 };
+                if (!state.settings) state.settings = { theme: 'dark', notifications: false };
             }
+        }
+
+        function mergeDeep(target, source) {
+            const output = { ...target };
+            for (const key of Object.keys(source)) {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key]) && !(source[key] instanceof Date)) {
+                    output[key] = mergeDeep(target[key] || {}, source[key]);
+                } else {
+                    output[key] = source[key];
+                }
+            }
+            return output;
         }
 
         function saveState() {
@@ -455,29 +1303,80 @@
             const tomorrow = new Date(now);
             tomorrow.setDate(tomorrow.getDate() + 1);
             const isTomorrow = date.toDateString() === tomorrow.toDateString();
-
             const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (isToday) return `Today ${time}`;
+            if (isTomorrow) return `Tomorrow ${time}`;
+            const day = date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+            return `${day} ${time}`;
+        }
 
-            if (isToday) {
-                return `Today ${time}`;
-            } else if (isTomorrow) {
-                return `Tomorrow ${time}`;
-            } else {
-                const day = date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
-                return `${day} ${time}`;
-            }
+        function formatHours(ms) {
+            return Math.round(ms / (1000 * 60 * 60) * 10) / 10;
         }
 
         function getPhase(elapsedHours) {
             let currentPhase = phases[0];
             for (const phase of phases) {
-                if (elapsedHours >= phase.hours) {
-                    currentPhase = phase;
-                }
+                if (elapsedHours >= phase.hours) currentPhase = phase;
             }
             return currentPhase;
         }
 
+        // Theme
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            metaTheme.content = theme === 'dark' ? '#1a1a2e' : '#f0f2f5';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            state.settings.theme = state.settings.theme === 'dark' ? 'light' : 'dark';
+            applyTheme(state.settings.theme);
+            saveState();
+        });
+
+        // Toast
+        function showToast(icon, text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-icon').textContent = icon;
+            document.getElementById('toast-text').textContent = text;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Notifications
+        function sendNotification(title, body) {
+            if (state.settings.notifications && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body, icon: 'icon-192.svg' });
+            }
+        }
+
+        const notifToggle = document.getElementById('notif-toggle');
+        notifToggle.addEventListener('change', async () => {
+            if (notifToggle.checked) {
+                if ('Notification' in window) {
+                    const perm = await Notification.requestPermission();
+                    if (perm === 'granted') {
+                        state.settings.notifications = true;
+                        showToast('\uD83D\uDD14', 'Notifications enabled');
+                    } else {
+                        notifToggle.checked = false;
+                        showToast('\u274C', 'Notification permission denied');
+                        return;
+                    }
+                } else {
+                    notifToggle.checked = false;
+                    showToast('\u274C', 'Notifications not supported');
+                    return;
+                }
+            } else {
+                state.settings.notifications = false;
+            }
+            saveState();
+        });
+
+        // Main UI update
         function updateUI() {
             if (state.isFasting && state.startTime) {
                 const now = new Date();
@@ -487,11 +1386,9 @@
                 const percentage = Math.floor(progress * 100);
                 const elapsedHours = elapsed / (1000 * 60 * 60);
 
-                // Update progress ring
                 const offset = CIRCUMFERENCE * (1 - progress);
                 progressFill.style.strokeDashoffset = offset;
 
-                // Update text
                 percentageEl.textContent = `${percentage}%`;
                 elapsedEl.textContent = formatTime(elapsed);
                 remainingEl.textContent = remaining > 0 ? formatTime(remaining) : "Complete!";
@@ -500,23 +1397,35 @@
                 const endTime = new Date(state.startTime.getTime() + state.duration);
                 endTimeEl.textContent = formatEndTime(endTime);
 
-                // Update phase
                 const phase = getPhase(elapsedHours);
                 phaseIndicator.classList.remove('hidden');
                 phaseName.textContent = phase.name;
                 phaseDesc.textContent = phase.desc;
 
+                // Phase notifications
+                if (state.settings.notifications && lastPhaseNotified !== phase.name && phase.hours > 0) {
+                    lastPhaseNotified = phase.name;
+                    sendNotification('FastTrack', `You've entered: ${phase.name} - ${phase.desc}`);
+                }
+
                 if (percentage >= 100) {
                     statusText.textContent = "Goal reached!";
+                    shareBtn.classList.remove('hidden');
                     if (!state.celebrated) {
                         celebrate();
                         state.celebrated = true;
+                        saveState();
+                    }
+                    if (!state.notifiedComplete) {
+                        sendNotification('FastTrack - Goal Reached!', `Congratulations! Your ${formatHours(state.duration)}h fast is complete!`);
+                        state.notifiedComplete = true;
+                        saveState();
                     }
                 } else {
                     statusText.textContent = "Fasting";
+                    shareBtn.classList.add('hidden');
                 }
 
-                // UI state
                 startBtn.classList.add('hidden');
                 stopBtn.classList.remove('hidden');
                 durationSelector.style.opacity = '0.5';
@@ -533,11 +1442,11 @@
                 phaseIndicator.classList.add('hidden');
                 startBtn.classList.remove('hidden');
                 stopBtn.classList.add('hidden');
+                shareBtn.classList.add('hidden');
                 durationSelector.style.opacity = '1';
                 durationSelector.style.pointerEvents = 'auto';
             }
 
-            // Update stats
             streakEl.textContent = state.stats.streak;
             totalFastsEl.textContent = state.stats.totalFasts;
             longestEl.textContent = `${Math.floor(state.stats.longestFast)}h`;
@@ -547,25 +1456,67 @@
             state.isFasting = true;
             state.startTime = new Date();
             state.celebrated = false;
+            state.notifiedComplete = false;
+            lastPhaseNotified = null;
+
+            // Check early bird / night owl achievements
+            const hour = state.startTime.getHours();
+            if (hour < 6) checkAchievements('early_bird');
+            if (hour >= 20) checkAchievements('night_owl');
+
             saveState();
             updateUI();
         }
 
-        function endFast() {
+        function showEndFastModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal">
+                    <h3>End your fast?</h3>
+                    <textarea id="fast-note" placeholder="Add a note (optional)..."></textarea>
+                    <div class="modal-buttons">
+                        <button class="modal-cancel" id="modal-cancel">Cancel</button>
+                        <button class="modal-confirm" id="modal-confirm">End Fast</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            document.getElementById('modal-cancel').addEventListener('click', () => overlay.remove());
+            document.getElementById('modal-confirm').addEventListener('click', () => {
+                const note = document.getElementById('fast-note').value.trim();
+                overlay.remove();
+                endFast(note);
+            });
+        }
+
+        function endFast(note) {
             if (state.isFasting && state.startTime) {
-                const elapsed = new Date() - state.startTime;
+                const now = new Date();
+                const elapsed = now - state.startTime;
                 const elapsedHours = elapsed / (1000 * 60 * 60);
                 const targetHours = state.duration / (1000 * 60 * 60);
+                const completed = elapsedHours >= targetHours * 0.5;
 
-                // Update stats if fast was at least 50% complete
-                if (elapsedHours >= targetHours * 0.5) {
+                // Add to history
+                state.history.unshift({
+                    id: Date.now(),
+                    startTime: state.startTime.toISOString(),
+                    endTime: now.toISOString(),
+                    targetDuration: state.duration,
+                    actualDuration: elapsed,
+                    completed: completed,
+                    note: note || ''
+                });
+
+                if (completed) {
                     state.stats.totalFasts++;
 
                     if (elapsedHours > state.stats.longestFast) {
                         state.stats.longestFast = elapsedHours;
                     }
 
-                    // Streak logic
                     const today = new Date().toDateString();
                     if (state.stats.lastFastDate !== today) {
                         const yesterday = new Date();
@@ -584,6 +1535,13 @@
             state.startTime = null;
             saveState();
             updateUI();
+            checkAchievements();
+            renderHistory();
+            renderWeeklySummary();
+            renderAchievements();
+            renderCalendar();
+            renderTrends();
+            updateGoalProgress();
         }
 
         function setDuration(hours) {
@@ -610,11 +1568,367 @@
             setTimeout(() => document.querySelector('.container').classList.remove('celebrate'), 500);
         }
 
-        // Event listeners
-        startBtn.addEventListener('click', startFast);
-        stopBtn.addEventListener('click', () => {
-            if (confirm('End your fast?')) endFast();
+        // Achievements
+        function checkAchievements(ctx) {
+            for (const a of ACHIEVEMENTS) {
+                if (!state.achievements.unlocked[a.id] && a.check(state, ctx)) {
+                    state.achievements.unlocked[a.id] = Date.now();
+                    showToast(a.icon, `Achievement: ${a.name}`);
+                    sendNotification('Achievement Unlocked!', `${a.icon} ${a.name} - ${a.desc}`);
+                }
+            }
+            saveState();
+        }
+
+        function renderAchievements() {
+            const grid = document.getElementById('achievements-grid');
+            grid.innerHTML = ACHIEVEMENTS.map(a => {
+                const unlocked = state.achievements.unlocked[a.id];
+                return `<div class="achievement ${unlocked ? 'unlocked' : 'locked'}" title="${a.desc}">
+                    <span class="achievement-icon">${a.icon}</span>
+                    <div class="achievement-name">${a.name}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // Weekly Summary
+        function getWeekStart() {
+            const now = new Date();
+            const day = now.getDay();
+            const start = new Date(now);
+            start.setDate(start.getDate() - day);
+            start.setHours(0, 0, 0, 0);
+            return start;
+        }
+
+        function getWeekFasts() {
+            const weekStart = getWeekStart();
+            return state.history.filter(h => new Date(h.endTime) >= weekStart);
+        }
+
+        function renderWeeklySummary() {
+            const fasts = getWeekFasts();
+            const completed = fasts.filter(f => f.completed);
+
+            const avgMs = completed.length ? completed.reduce((s, f) => s + f.actualDuration, 0) / completed.length : 0;
+            const totalMs = fasts.reduce((s, f) => s + f.actualDuration, 0);
+            const rate = fasts.length ? Math.round((completed.length / fasts.length) * 100) : 0;
+
+            document.getElementById('summary-avg').textContent = `${Math.round(formatHours(avgMs))}h`;
+            document.getElementById('summary-rate').textContent = `${rate}%`;
+            document.getElementById('summary-total').textContent = `${Math.round(formatHours(totalMs))}h`;
+        }
+
+        // Weekly Goal
+        function updateGoalProgress() {
+            const weekFasts = getWeekFasts().filter(f => f.completed);
+            const count = weekFasts.length;
+            const target = state.goals.weeklyTarget;
+            const pct = Math.min((count / target) * 100, 100);
+            document.getElementById('goal-progress-fill').style.width = `${pct}%`;
+            document.getElementById('goal-text').textContent = `${count} / ${target} fasts this week`;
+        }
+
+        document.getElementById('goal-edit-btn').addEventListener('click', () => {
+            const row = document.getElementById('goal-input-row');
+            row.classList.toggle('hidden');
+            document.getElementById('goal-input').value = state.goals.weeklyTarget;
         });
+
+        document.getElementById('goal-save-btn').addEventListener('click', () => {
+            const val = parseInt(document.getElementById('goal-input').value) || 5;
+            state.goals.weeklyTarget = Math.max(1, Math.min(14, val));
+            document.getElementById('goal-input-row').classList.add('hidden');
+            saveState();
+            updateGoalProgress();
+        });
+
+        // History
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            const showAll = document.getElementById('history-show-all');
+            const toggleBtn = document.getElementById('history-toggle-btn');
+
+            if (!state.history.length) {
+                list.innerHTML = '<div class="history-empty">No fasts recorded yet</div>';
+                showAll.classList.add('hidden');
+                return;
+            }
+
+            const items = historyShowAll ? state.history : state.history.slice(0, 10);
+            list.innerHTML = items.map(h => {
+                const start = new Date(h.startTime);
+                const dur = formatHours(h.actualDuration);
+                const target = formatHours(h.targetDuration);
+                const pct = Math.round((h.actualDuration / h.targetDuration) * 100);
+                const dateStr = start.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+                const timeStr = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return `<div class="history-item">
+                    <div class="history-info">
+                        <div class="history-date">${dateStr} at ${timeStr}</div>
+                        <div class="history-details">${dur}h / ${target}h (${pct}%)</div>
+                        ${h.note ? `<div class="history-note">"${h.note}"</div>` : ''}
+                    </div>
+                    <span class="history-status ${h.completed ? 'completed' : 'partial'}">${h.completed ? 'Done' : 'Partial'}</span>
+                    <button class="history-delete" data-id="${h.id}" title="Delete">\u2715</button>
+                </div>`;
+            }).join('');
+
+            // Delete handlers
+            list.querySelectorAll('.history-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id);
+                    state.history = state.history.filter(h => h.id !== id);
+                    saveState();
+                    renderHistory();
+                    renderWeeklySummary();
+                    renderCalendar();
+                    renderTrends();
+                    updateGoalProgress();
+                });
+            });
+
+            if (state.history.length > 10) {
+                showAll.classList.remove('hidden');
+                toggleBtn.textContent = historyShowAll ? 'Show Less' : `Show All (${state.history.length})`;
+            } else {
+                showAll.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('history-toggle-btn').addEventListener('click', () => {
+            historyShowAll = !historyShowAll;
+            renderHistory();
+        });
+
+        // Calendar
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthLabel = document.getElementById('cal-month');
+            const date = new Date(calendarYear, calendarMonth, 1);
+            monthLabel.textContent = date.toLocaleDateString([], { month: 'long', year: 'numeric' });
+
+            const firstDay = date.getDay();
+            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+            const today = new Date();
+
+            // Build fasting hours per day for this month
+            const dayHours = {};
+            state.history.forEach(h => {
+                const d = new Date(h.endTime);
+                if (d.getMonth() === calendarMonth && d.getFullYear() === calendarYear) {
+                    const key = d.getDate();
+                    dayHours[key] = (dayHours[key] || 0) + formatHours(h.actualDuration);
+                }
+            });
+
+            let html = '';
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+            for (let d = 1; d <= daysInMonth; d++) {
+                const hours = dayHours[d] || 0;
+                let level = '';
+                if (hours > 0) level = 'level-1';
+                if (hours >= 12) level = 'level-2';
+                if (hours >= 18) level = 'level-3';
+                if (hours >= 24) level = 'level-4';
+                const isToday = d === today.getDate() && calendarMonth === today.getMonth() && calendarYear === today.getFullYear();
+                html += `<div class="calendar-day ${level} ${isToday ? 'today' : ''}">${d}</div>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        document.getElementById('cal-prev').addEventListener('click', () => {
+            calendarMonth--;
+            if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+            renderCalendar();
+        });
+
+        document.getElementById('cal-next').addEventListener('click', () => {
+            calendarMonth++;
+            if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+            renderCalendar();
+        });
+
+        // Trends Chart
+        function renderTrends() {
+            const svg = document.getElementById('trends-svg');
+            // Keep defs
+            const defs = svg.querySelector('defs').outerHTML;
+
+            const now = new Date();
+            const entries = [];
+            for (let i = trendsDays - 1; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(d.getDate() - i);
+                d.setHours(0, 0, 0, 0);
+                const nextD = new Date(d);
+                nextD.setDate(nextD.getDate() + 1);
+
+                const dayFasts = state.history.filter(h => {
+                    const end = new Date(h.endTime);
+                    return end >= d && end < nextD;
+                });
+                const totalHours = dayFasts.reduce((s, h) => s + formatHours(h.actualDuration), 0);
+                const label = trendsDays <= 7
+                    ? d.toLocaleDateString([], { weekday: 'short' })
+                    : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                entries.push({ label, hours: totalHours });
+            }
+
+            const maxH = Math.max(...entries.map(e => e.hours), 1);
+            const barWidth = trendsDays <= 7 ? 35 : 10;
+            const gap = trendsDays <= 7 ? 18 : 2;
+            const totalWidth = entries.length * (barWidth + gap);
+            const offsetX = (370 - totalWidth) / 2;
+            const chartHeight = 85;
+
+            let bars = defs;
+            if (entries.every(e => e.hours === 0)) {
+                bars += `<text class="chart-empty" x="185" y="65">No data yet</text>`;
+            } else {
+                entries.forEach((e, i) => {
+                    const x = offsetX + i * (barWidth + gap);
+                    const h = (e.hours / maxH) * chartHeight;
+                    const y = chartHeight - h + 5;
+                    if (e.hours > 0) {
+                        bars += `<rect class="chart-bar" x="${x}" y="${y}" width="${barWidth}" height="${h}"/>`;
+                        bars += `<text class="chart-value" x="${x + barWidth / 2}" y="${y - 3}">${Math.round(e.hours)}h</text>`;
+                    }
+                    bars += `<text class="chart-label" x="${x + barWidth / 2}" y="110">${e.label}</text>`;
+                });
+            }
+            svg.innerHTML = bars;
+        }
+
+        document.querySelector('.trends-toggle').addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            trendsDays = parseInt(btn.dataset.days);
+            document.querySelectorAll('.trends-toggle button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderTrends();
+        });
+
+        // Export / Import
+        document.getElementById('export-btn').addEventListener('click', () => {
+            const data = JSON.stringify(state, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'fasttrack_data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('\uD83D\uDCBE', 'Data exported');
+        });
+
+        document.getElementById('import-btn').addEventListener('click', () => {
+            document.getElementById('import-file').click();
+        });
+
+        document.getElementById('import-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const imported = JSON.parse(ev.target.result);
+                    if (imported.stats && typeof imported.stats === 'object') {
+                        state = mergeDeep(state, imported);
+                        if (state.startTime) state.startTime = new Date(state.startTime);
+                        saveState();
+                        updateUI();
+                        renderAll();
+                        showToast('\u2705', 'Data imported successfully');
+                    } else {
+                        showToast('\u274C', 'Invalid data format');
+                    }
+                } catch {
+                    showToast('\u274C', 'Failed to parse file');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        // Share Card
+        shareBtn.addEventListener('click', () => {
+            const canvas = document.getElementById('share-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            const bg = ctx.createLinearGradient(0, 0, 600, 400);
+            bg.addColorStop(0, '#1a1a2e');
+            bg.addColorStop(0.5, '#16213e');
+            bg.addColorStop(1, '#0f3460');
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, 600, 400);
+
+            // Title
+            const grad = ctx.createLinearGradient(0, 0, 300, 0);
+            grad.addColorStop(0, '#e94560');
+            grad.addColorStop(1, '#ff6b6b');
+            ctx.fillStyle = grad;
+            ctx.font = 'bold 36px -apple-system, sans-serif';
+            ctx.fillText('FastTrack', 30, 55);
+
+            // Duration
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 48px -apple-system, sans-serif';
+            const dur = state.isFasting && state.startTime
+                ? `${Math.round((new Date() - state.startTime) / (1000 * 60 * 60))}h`
+                : `${Math.round(formatHours(state.duration))}h`;
+            ctx.fillText(dur + ' Fast Complete', 30, 130);
+
+            // Stats
+            ctx.fillStyle = '#888';
+            ctx.font = '20px -apple-system, sans-serif';
+            ctx.fillText(`Streak: ${state.stats.streak} days`, 30, 190);
+            ctx.fillText(`Total Fasts: ${state.stats.totalFasts}`, 30, 225);
+            ctx.fillText(`Longest: ${Math.floor(state.stats.longestFast)}h`, 30, 260);
+
+            // Date
+            ctx.fillStyle = '#555';
+            ctx.font = '16px -apple-system, sans-serif';
+            ctx.fillText(new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }), 30, 310);
+
+            // Decorative circle
+            const cg = ctx.createLinearGradient(450, 80, 550, 280);
+            cg.addColorStop(0, '#e94560');
+            cg.addColorStop(1, '#ff6b6b');
+            ctx.strokeStyle = cg;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.arc(500, 200, 100, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 40px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('100%', 500, 210);
+            ctx.textAlign = 'left';
+
+            // Watermark
+            ctx.fillStyle = '#444';
+            ctx.font = '14px -apple-system, sans-serif';
+            ctx.fillText('fasttrack', 30, 375);
+
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'fasttrack-achievement.png';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('\uD83D\uDCF8', 'Share card downloaded');
+            });
+        });
+
+        // Duration selector events
+        startBtn.addEventListener('click', startFast);
+        stopBtn.addEventListener('click', showEndFastModal);
 
         const customBtn = document.getElementById('custom-btn');
         const customInputWrapper = document.getElementById('custom-input-wrapper');
@@ -623,21 +1937,15 @@
         const customSetBtn = document.getElementById('custom-set-btn');
 
         function clearAllActive() {
-            document.querySelectorAll('.duration-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            document.querySelectorAll('.duration-btn').forEach(btn => btn.classList.remove('active'));
         }
 
         function formatCustomLabel(totalHours) {
             const days = Math.floor(totalHours / 24);
             const hrs = totalHours % 24;
-            if (days > 0 && hrs > 0) {
-                return `${days}d ${hrs}h`;
-            } else if (days > 0) {
-                return `${days}d`;
-            } else {
-                return `${totalHours}h`;
-            }
+            if (days > 0 && hrs > 0) return `${days}d ${hrs}h`;
+            if (days > 0) return `${days}d`;
+            return `${totalHours}h`;
         }
 
         durationSelector.addEventListener('click', (e) => {
@@ -645,9 +1953,7 @@
             if (btn && !state.isFasting) {
                 if (btn.dataset.hours === 'custom') {
                     customInputWrapper.classList.toggle('show');
-                    if (customInputWrapper.classList.contains('show')) {
-                        customDaysInput.focus();
-                    }
+                    if (customInputWrapper.classList.contains('show')) customDaysInput.focus();
                 } else {
                     customInputWrapper.classList.remove('show');
                     clearAllActive();
@@ -662,7 +1968,6 @@
             const days = parseInt(customDaysInput.value) || 0;
             const hours = parseInt(customHoursInput.value) || 0;
             const totalHours = (days * 24) + hours;
-
             if (totalHours > 0 && totalHours <= 960) {
                 clearAllActive();
                 customBtn.classList.add('active');
@@ -672,16 +1977,22 @@
             }
         });
 
-        customDaysInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') customSetBtn.click();
-        });
+        customDaysInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') customSetBtn.click(); });
+        customHoursInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') customSetBtn.click(); });
 
-        customHoursInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') customSetBtn.click();
-        });
+        function renderAll() {
+            renderHistory();
+            renderWeeklySummary();
+            renderAchievements();
+            renderCalendar();
+            renderTrends();
+            updateGoalProgress();
+        }
 
         // Initialize
         loadState();
+        applyTheme(state.settings.theme);
+        notifToggle.checked = state.settings.notifications;
 
         // Set active duration button on load
         const initHours = state.duration / (1000 * 60 * 60);
@@ -691,16 +2002,20 @@
         document.querySelectorAll('.duration-btn').forEach(btn => {
             if (btn.dataset.hours === 'custom') {
                 btn.classList.toggle('active', !isPreset);
-                if (!isPreset) {
-                    btn.innerHTML = `${formatCustomLabel(initHours)}<span>Custom</span>`;
-                }
+                if (!isPreset) btn.innerHTML = `${formatCustomLabel(initHours)}<span>Custom</span>`;
             } else {
                 btn.classList.toggle('active', parseInt(btn.dataset.hours) === initHours);
             }
         });
 
         updateUI();
+        renderAll();
         setInterval(updateUI, 1000);
+
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>
