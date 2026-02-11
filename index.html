@@ -1296,12 +1296,21 @@
             { id: 'hours_18', icon: '\uD83C\uDF19', name: '18 Hour Fast', desc: 'Complete an 18+ hour fast', check: s => s.stats.longestFast >= 18 },
             { id: 'hours_24', icon: '\uD83C\uDF1F', name: '24 Hour Fast', desc: 'Complete a 24+ hour fast', check: s => s.stats.longestFast >= 24 },
             { id: 'hours_36', icon: '\uD83D\uDE80', name: '36 Hour Fast', desc: 'Complete a 36+ hour fast', check: s => s.stats.longestFast >= 36 },
+            { id: 'hours_48', icon: '\uD83D\uDCAB', name: '48 Hour Fast', desc: 'Two full days \u2014 true resilience', check: s => s.stats.longestFast >= 48 },
+            { id: 'hours_72', icon: '\uD83E\uDDEC', name: '72 Hour Fast', desc: 'Three days \u2014 deep cellular renewal', check: s => s.stats.longestFast >= 72 },
             { id: 'early_bird', icon: '\uD83C\uDF05', name: 'Early Bird', desc: 'Start a fast before 6 AM', check: (s, ctx) => ctx === 'early_bird' },
             { id: 'night_owl', icon: '\uD83C\uDF03', name: 'Night Owl', desc: 'Start a fast after 8 PM', check: (s, ctx) => ctx === 'night_owl' },
             { id: 'century', icon: '\uD83C\uDFAF', name: 'Century', desc: 'Fast 100+ hours total', check: s => {
                 const total = (s.history || []).reduce((sum, h) => sum + (h.actualDuration || 0), 0);
                 return total >= 100 * 3600000;
-            }}
+            }},
+            { id: 'hours_120', icon: '\uD83E\uDDD8', name: '5 Day Fast', desc: 'Five days of discipline and healing', check: s => s.stats.longestFast >= 120 },
+            { id: 'hours_168', icon: '\uD83C\uDF0A', name: 'One Week Fast', desc: 'A full week \u2014 you are unstoppable', check: s => s.stats.longestFast >= 168 },
+            { id: 'hours_240', icon: '\uD83C\uDFD4', name: '10 Day Fast', desc: 'Mountain-level endurance', check: s => s.stats.longestFast >= 240 },
+            { id: 'hours_336', icon: '\uD83D\uDD25', name: '14 Day Fast', desc: 'Two weeks of transformation', check: s => s.stats.longestFast >= 336 },
+            { id: 'hours_504', icon: '\uD83C\uDF1E', name: '21 Day Fast', desc: 'Three weeks \u2014 a new you emerges', check: s => s.stats.longestFast >= 504 },
+            { id: 'hours_720', icon: '\uD83D\uDC51', name: '30 Day Fast', desc: 'One month \u2014 legendary willpower', check: s => s.stats.longestFast >= 720 },
+            { id: 'hours_960', icon: '\u2728', name: 'The Jesus Fast', desc: '40 days \u2014 a spiritual triumph', check: s => s.stats.longestFast >= 960 }
         ];
 
         let state = {
@@ -1338,6 +1347,17 @@
             { type: 'time', hours: 18, icon: '\uD83E\uDDEC', name: 'Deep State', desc: 'Entering deep ketosis' },
             { type: 'time', hours: 24, icon: '\uD83C\uDF1F', name: 'Full Day', desc: '24 hours strong' },
             { type: 'time', hours: 36, icon: '\uD83D\uDE80', name: 'Ultra Faster', desc: 'Elite territory' },
+            { type: 'time', hours: 48, icon: '\uD83D\uDCAB', name: 'Two Days Down', desc: 'Resilience unlocked' },
+            { type: 'time', hours: 72, icon: '\uD83E\uDDEC', name: 'Three Day Wall', desc: 'You broke through' },
+            { type: 'time', hours: 96, icon: '\uD83D\uDEE1', name: 'Day Four', desc: 'Immune system resetting' },
+            { type: 'time', hours: 120, icon: '\uD83E\uDDD8', name: 'Five Days Strong', desc: 'Mind and body in sync' },
+            { type: 'time', hours: 144, icon: '\uD83C\uDF3F', name: 'Day Six', desc: 'Deep healing underway' },
+            { type: 'time', hours: 168, icon: '\uD83C\uDF0A', name: 'One Full Week', desc: 'A week of willpower' },
+            { type: 'time', hours: 240, icon: '\uD83C\uDFD4', name: '10 Days', desc: 'Into the unknown' },
+            { type: 'time', hours: 336, icon: '\uD83D\uDD25', name: 'Two Weeks', desc: 'You are transforming' },
+            { type: 'time', hours: 504, icon: '\uD83C\uDF1E', name: 'Three Weeks', desc: 'A new you is emerging' },
+            { type: 'time', hours: 720, icon: '\uD83D\uDC51', name: '30 Days', desc: 'Legendary status' },
+            { type: 'time', hours: 960, icon: '\u2728', name: 'The Jesus Fast', desc: '40 days \u2014 spiritual triumph' },
             { type: 'pct', pct: 25, icon: '\uD83C\uDFAF', name: 'Quarter Way', desc: '25% complete' },
             { type: 'pct', pct: 50, icon: '\u2B50', name: 'Halfway There', desc: '50% complete' },
             { type: 'pct', pct: 75, icon: '\uD83D\uDCAA', name: 'Final Stretch', desc: '75% complete' },
