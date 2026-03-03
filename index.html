@@ -256,6 +256,53 @@
             cursor: pointer;
         }
 
+        .backdate-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-bottom: 8px;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .backdate-toggle:hover {
+            color: var(--text-primary);
+        }
+
+        .backdate-wrapper {
+            display: none;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .backdate-wrapper.show {
+            display: block;
+        }
+
+        .backdate-wrapper label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .backdate-input {
+            background: var(--bg-input);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            width: 100%;
+            max-width: 260px;
+            box-sizing: border-box;
+            color-scheme: dark;
+        }
+
         .main-btn {
             width: 100%;
             padding: 18px;
@@ -1123,6 +1170,12 @@
             </div>
         </div>
 
+        <button class="backdate-toggle" id="backdate-toggle">Already fasting?</button>
+        <div class="backdate-wrapper" id="backdate-wrapper">
+            <label for="backdate-input">When did your fast start?</label>
+            <input type="datetime-local" class="backdate-input" id="backdate-input">
+        </div>
+
         <button class="main-btn start-btn" id="start-btn">Start Fast</button>
         <button class="main-btn stop-btn hidden" id="stop-btn">End Fast</button>
         <button class="share-btn hidden" id="share-btn">Share Your Achievement</button>
@@ -1615,6 +1668,8 @@
 
                 startBtn.classList.add('hidden');
                 stopBtn.classList.remove('hidden');
+                document.getElementById('backdate-toggle').classList.add('hidden');
+                document.getElementById('backdate-wrapper').classList.remove('show');
                 durationSelector.style.opacity = '0.5';
                 durationSelector.style.pointerEvents = 'none';
             } else {
@@ -1632,6 +1687,7 @@
                 startBtn.classList.remove('hidden');
                 stopBtn.classList.add('hidden');
                 shareBtn.classList.add('hidden');
+                document.getElementById('backdate-toggle').classList.remove('hidden');
                 durationSelector.style.opacity = '1';
                 durationSelector.style.pointerEvents = 'auto';
             }
@@ -1642,8 +1698,21 @@
         }
 
         function startFast() {
+            const backdateInput = document.getElementById('backdate-input');
+            let startTime = new Date();
+
+            if (backdateInput.value) {
+                const backdated = new Date(backdateInput.value);
+                if (backdated > new Date()) {
+                    showToast('⚠️', 'Start time cannot be in the future');
+                    return;
+                }
+                startTime = backdated;
+                backdateInput.value = '';
+            }
+
             state.isFasting = true;
-            state.startTime = new Date();
+            state.startTime = startTime;
             state.celebrated = false;
             state.notifiedComplete = false;
             lastPhaseNotified = null;
@@ -1652,6 +1721,10 @@
             const hour = state.startTime.getHours();
             if (hour < 6) checkAchievements('early_bird');
             if (hour >= 20) checkAchievements('night_owl');
+
+            // Hide backdate UI
+            document.getElementById('backdate-wrapper').classList.remove('show');
+            document.getElementById('backdate-toggle').classList.add('hidden');
 
             saveState();
             updateUI();
@@ -2113,6 +2186,13 @@
                 URL.revokeObjectURL(url);
                 showToast('\uD83D\uDCF8', 'Share card downloaded');
             });
+        });
+
+        // Backdate toggle
+        const backdateToggle = document.getElementById('backdate-toggle');
+        const backdateWrapper = document.getElementById('backdate-wrapper');
+        backdateToggle.addEventListener('click', () => {
+            backdateWrapper.classList.toggle('show');
         });
 
         // Duration selector events
