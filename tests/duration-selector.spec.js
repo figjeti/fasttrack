@@ -6,6 +6,8 @@ test.describe('Duration Selector', () => {
         // Clear localStorage to start fresh
         await page.evaluate(() => localStorage.clear());
         await page.reload();
+        // Toggle to remaining mode so we can check duration display
+        await page.locator('#time-toggle').click();
     });
 
     test('should have 16h selected by default', async ({ page }) => {
@@ -20,7 +22,7 @@ test.describe('Duration Selector', () => {
         await expect(btn12h).toHaveClass(/active/);
 
         // Check that remaining time shows 12:00:00
-        const remaining = page.locator('#remaining');
+        const remaining = page.locator('#time-primary');
         await expect(remaining).toHaveText('12:00:00');
     });
 
@@ -33,7 +35,7 @@ test.describe('Duration Selector', () => {
         await expect(btn18h).toHaveClass(/active/);
         await expect(btn16h).not.toHaveClass(/active/);
 
-        const remaining = page.locator('#remaining');
+        const remaining = page.locator('#time-primary');
         await expect(remaining).toHaveText('18:00:00');
     });
 
@@ -43,7 +45,7 @@ test.describe('Duration Selector', () => {
 
         await expect(btn20h).toHaveClass(/active/);
 
-        const remaining = page.locator('#remaining');
+        const remaining = page.locator('#time-primary');
         await expect(remaining).toHaveText('20:00:00');
     });
 
@@ -53,7 +55,7 @@ test.describe('Duration Selector', () => {
 
         await expect(btn24h).toHaveClass(/active/);
 
-        const remaining = page.locator('#remaining');
+        const remaining = page.locator('#time-primary');
         await expect(remaining).toHaveText('24:00:00');
     });
 
@@ -78,7 +80,7 @@ test.describe('Duration Selector', () => {
         await expect(customBtn).toHaveClass(/active/);
         await expect(customBtn).toContainText('14h');
 
-        const remaining = page.locator('#remaining');
+        const remaining = page.locator('#time-primary');
         await expect(remaining).toHaveText('14:00:00');
     });
 
@@ -96,8 +98,8 @@ test.describe('Duration Selector', () => {
         await expect(customBtn).toHaveClass(/active/);
         await expect(customBtn).toContainText('2d 6h');
 
-        const remaining = page.locator('#remaining');
-        await expect(remaining).toHaveText('54:00:00');
+        const remaining = page.locator('#time-primary');
+        await expect(remaining).toHaveText('2d 6h 0m');
     });
 
     test('should set custom days only duration', async ({ page }) => {
@@ -112,8 +114,8 @@ test.describe('Duration Selector', () => {
         await expect(customBtn).toHaveClass(/active/);
         await expect(customBtn).toContainText('3d');
 
-        const remaining = page.locator('#remaining');
-        await expect(remaining).toHaveText('72:00:00');
+        const remaining = page.locator('#time-primary');
+        await expect(remaining).toHaveText('3d 0h 0m');
     });
 
     test('should deselect custom when selecting preset', async ({ page }) => {
@@ -141,7 +143,7 @@ test.describe('Duration Selector', () => {
         await page.reload();
 
         await expect(btn24h).toHaveClass(/active/);
-        const remaining = page.locator('#remaining');
+        const remaining = page.locator('#time-primary');
         await expect(remaining).toHaveText('24:00:00');
     });
 

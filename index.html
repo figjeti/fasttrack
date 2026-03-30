@@ -158,6 +158,62 @@
             backdrop-filter: blur(10px);
         }
 
+        .time-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .time-toggle-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+            user-select: none;
+        }
+
+        .time-toggle-label.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .time-toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .time-toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .time-toggle-switch.toggled::after {
+            transform: translateX(20px);
+        }
+
+        .time-primary-value {
+            text-align: center;
+            font-weight: 700;
+            font-size: 2rem;
+            color: var(--accent);
+            padding: 8px 0 16px;
+            letter-spacing: 1px;
+        }
+
         .time-row {
             display: flex;
             justify-content: space-between;
@@ -177,11 +233,6 @@
         .time-value {
             font-weight: 600;
             font-size: 1.1rem;
-        }
-
-        .time-value.highlight {
-            color: var(--accent);
-            font-size: 1.3rem;
         }
 
         .duration-selector {
@@ -1138,14 +1189,12 @@
         </div>
 
         <div class="time-display">
-            <div class="time-row">
-                <span class="time-label">Elapsed</span>
-                <span class="time-value" id="elapsed">00:00:00</span>
+            <div class="time-toggle">
+                <span class="time-toggle-label active" id="toggle-elapsed-label">Elapsed</span>
+                <div class="time-toggle-switch" id="time-toggle"></div>
+                <span class="time-toggle-label" id="toggle-remaining-label">Remaining</span>
             </div>
-            <div class="time-row">
-                <span class="time-label">Remaining</span>
-                <span class="time-value highlight" id="remaining">--:--:--</span>
-            </div>
+            <div class="time-primary-value" id="time-primary">00:00:00</div>
             <div class="time-row" id="start-time-row">
                 <span class="time-label">Started</span>
                 <span class="time-value" id="start-time">-</span>
@@ -1381,7 +1430,7 @@
             history: [],
             achievements: { unlocked: {} },
             goals: { weeklyTarget: 5 },
-            settings: { theme: 'dark', notifications: false }
+            settings: { theme: 'dark', notifications: false, timeDisplayMode: 'elapsed' }
         };
 
         let calendarMonth = new Date().getMonth();
@@ -1421,8 +1470,10 @@
         const progressFill = document.querySelector('.progress-ring-fill');
         const percentageEl = document.querySelector('.percentage');
         const statusText = document.querySelector('.status-text');
-        const elapsedEl = document.getElementById('elapsed');
-        const remainingEl = document.getElementById('remaining');
+        const timePrimaryEl = document.getElementById('time-primary');
+        const timeToggleEl = document.getElementById('time-toggle');
+        const toggleElapsedLabel = document.getElementById('toggle-elapsed-label');
+        const toggleRemainingLabel = document.getElementById('toggle-remaining-label');
         const startTimeEl = document.getElementById('start-time');
         const endTimeEl = document.getElementById('end-time');
         const startBtn = document.getElementById('start-btn');
@@ -1471,8 +1522,18 @@
         function formatTime(ms) {
             if (ms < 0) ms = 0;
             const totalSeconds = Math.floor(ms / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const totalHours = Math.floor(totalMinutes / 60);
+
+            if (totalHours >= 25) {
+                const days = Math.floor(totalHours / 24);
+                const hours = totalHours % 24;
+                const minutes = totalMinutes % 60;
+                return `${days}d ${hours}h ${minutes}m`;
+            }
+
+            const hours = totalHours;
+            const minutes = totalMinutes % 60;
             const seconds = totalSeconds % 60;
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
@@ -1519,6 +1580,41 @@
             applyTheme(state.settings.theme);
             saveState();
         });
+
+        // Time display toggle
+        function updateTimeToggleUI() {
+            const isRemaining = state.settings.timeDisplayMode === 'remaining';
+            timeToggleEl.classList.toggle('toggled', isRemaining);
+            toggleElapsedLabel.classList.toggle('active', !isRemaining);
+            toggleRemainingLabel.classList.toggle('active', isRemaining);
+        }
+
+        timeToggleEl.addEventListener('click', () => {
+            state.settings.timeDisplayMode = state.settings.timeDisplayMode === 'elapsed' ? 'remaining' : 'elapsed';
+            updateTimeToggleUI();
+            updateUI();
+            saveState();
+        });
+
+        toggleElapsedLabel.addEventListener('click', () => {
+            if (state.settings.timeDisplayMode !== 'elapsed') {
+                state.settings.timeDisplayMode = 'elapsed';
+                updateTimeToggleUI();
+                updateUI();
+                saveState();
+            }
+        });
+
+        toggleRemainingLabel.addEventListener('click', () => {
+            if (state.settings.timeDisplayMode !== 'remaining') {
+                state.settings.timeDisplayMode = 'remaining';
+                updateTimeToggleUI();
+                updateUI();
+                saveState();
+            }
+        });
+
+        updateTimeToggleUI();
 
         // Toast
         function showToast(icon, text) {
@@ -1627,8 +1723,11 @@
                 progressFill.style.strokeDashoffset = offset;
 
                 percentageEl.textContent = `${percentage}%`;
-                elapsedEl.textContent = formatTime(elapsed);
-                remainingEl.textContent = remaining > 0 ? formatTime(remaining) : "Complete!";
+                if (state.settings.timeDisplayMode === 'remaining') {
+                    timePrimaryEl.textContent = remaining > 0 ? formatTime(remaining) : `+${formatTime(Math.abs(remaining))}`;
+                } else {
+                    timePrimaryEl.textContent = formatTime(elapsed);
+                }
                 startTimeEl.textContent = formatEndTime(state.startTime);
 
                 const endTime = new Date(state.startTime.getTime() + state.duration);
@@ -1676,8 +1775,11 @@
                 progressFill.style.strokeDashoffset = CIRCUMFERENCE;
                 percentageEl.textContent = '0%';
                 statusText.textContent = 'Ready to start';
-                elapsedEl.textContent = '00:00:00';
-                remainingEl.textContent = formatTime(state.duration);
+                if (state.settings.timeDisplayMode === 'remaining') {
+                    timePrimaryEl.textContent = formatTime(state.duration);
+                } else {
+                    timePrimaryEl.textContent = '00:00:00';
+                }
                 startTimeEl.textContent = '-';
                 endTimeEl.textContent = '-';
 
@@ -2263,6 +2365,7 @@
         checkAchievements();
         applyTheme(state.settings.theme);
         notifToggle.checked = state.settings.notifications;
+        updateTimeToggleUI();
 
         // Set active duration button on load
         const initHours = state.duration / (1000 * 60 * 60);

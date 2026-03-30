@@ -31,14 +31,14 @@ test.describe('Fasting Stats', () => {
 
     test('should show elapsed time when fasting', async ({ page }) => {
         const startBtn = page.locator('#start-btn');
-        const elapsed = page.locator('#elapsed');
+        const timePrimary = page.locator('#time-primary');
 
-        await expect(elapsed).toHaveText('00:00:00');
+        await expect(timePrimary).toHaveText('00:00:00');
         await startBtn.click();
 
         // Wait a moment and check elapsed is updating
         await page.waitForTimeout(1100);
-        await expect(elapsed).not.toHaveText('00:00:00');
+        await expect(timePrimary).not.toHaveText('00:00:00');
     });
 
     test('should show start and end times when fasting', async ({ page }) => {
